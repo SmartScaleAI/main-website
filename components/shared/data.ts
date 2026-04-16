@@ -32,7 +32,6 @@ export interface FaqItem {
 
 export const NAV_ITEMS: [string, string][] = [
   ["how-it-works", "How It Works"],
-  ["pricing", "Pricing"],
   ["faq", "FAQ"],
 ];
 
@@ -144,6 +143,10 @@ export const PLANS: Plan[] = [
 ];
 
 export const FAQS: FaqItem[] = [
+  {
+    q: "How much does it cost?",
+    a: "Our pricing is tailored to the size and needs of your business. Book a free discovery call and a rep will walk you through a custom quote — no pressure, no commitment.",
+  },
   {
     q: "Will it sound robotic?",
     a: "Not at all. SmartScale AI uses the latest voice technology — it sounds natural, professional, and conversational. We give your receptionist a name and personality that represents your brand.",

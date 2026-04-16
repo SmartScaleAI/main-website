@@ -64,10 +64,10 @@ export function Navbar() {
           ))}
         </div>
         <button
-          onClick={() => scrollTo("pricing")}
+          onClick={() => scrollTo("faq")}
           className="bg-brand-blue text-brand-bg text-[13px] font-bold px-[22px] py-[10px] rounded-[6px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(41,182,246,0.3)]"
         >
-          Get Started
+          Book a Demo
         </button>
       </div>
 
@@ -98,10 +98,10 @@ export function Navbar() {
             ))}
             <div className="px-6 py-7">
               <button
-                onClick={() => scrollTo("pricing")}
+                onClick={() => scrollTo("faq")}
                 className="w-full bg-brand-blue text-brand-bg font-bold py-4 text-[16px] rounded-[6px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light"
               >
-                Get Started
+                Book a Demo
               </button>
             </div>
           </div>

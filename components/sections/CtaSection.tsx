@@ -39,16 +39,10 @@ export function CtaSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-[14px] justify-center flex-wrap">
             <a
-              href="#pricing"
+              href="#faq"
               className="bg-brand-blue text-brand-bg font-bold px-10 py-[17px] rounded-[6px] text-[16px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(41,182,246,0.3)] w-full sm:w-auto max-w-[320px] mx-auto sm:mx-0 text-center"
             >
-              Get Started Today
-            </a>
-            <a
-              href="#"
-              className="bg-transparent text-brand-text border border-brand-text/20 px-10 py-[17px] rounded-[6px] text-[16px] font-normal tracking-[0.02em] transition-all duration-200 hover:border-brand-blue/50 hover:text-brand-blue hover:-translate-y-px w-full sm:w-auto max-w-[320px] mx-auto sm:mx-0 text-center"
-            >
-              Book a Demo Call
+              Book a Free Demo
             </a>
           </div>
         </div>

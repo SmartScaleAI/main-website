@@ -104,10 +104,10 @@ export function Hero() {
             style={{ animationDelay: "0.36s" }}
           >
             <a
-              href="#pricing"
+              href="#faq"
               className="bg-brand-blue text-brand-bg font-bold px-8 py-[14px] rounded-[6px] text-[15px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(41,182,246,0.3)] w-full sm:w-auto max-w-[320px] text-center"
             >
-              See Plans &amp; Pricing
+              Book a Free Demo
             </a>
             <a
               href="#how-it-works"
