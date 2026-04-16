@@ -81,7 +81,8 @@ export function Navbar() {
         </SheetTrigger>
         <SheetContent
           side="top"
-          className="border-t border-brand-blue/10 bg-brand-bg/98 backdrop-blur-2xl pt-[68px] px-0 shadow-none"
+          showCloseButton={false}
+          className="border-t border-brand-blue/10 bg-brand-bg/98 backdrop-blur-2xl px-0 shadow-none"
           style={{ top: "68px", height: "auto" }}
         >
           <div className="flex flex-col">

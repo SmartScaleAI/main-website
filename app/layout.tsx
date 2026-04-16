@@ -11,9 +11,9 @@ const barlow = Barlow({
 });
 
 export const metadata: Metadata = {
-  title: "SmartScale AI — AI Receptionist for Home Services",
+  title: "SmartScale AI — AI Receptionist for Your Business",
   description:
-    "SmartScale AI answers every call 24/7, books appointments, and sends confirmations automatically — while you focus on the job.",
+    "SmartScale AI answers every call 24/7, books appointments, and sends confirmations automatically — so you never miss a customer again.",
 };
 
 export default function RootLayout({

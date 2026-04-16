@@ -1,27 +1,27 @@
 import {
   Phone,
   Calendar,
-  Wrench,
-  Droplets,
-  Snowflake,
-  Home,
-  Zap,
+  Stethoscope,
+  Scissors,
+  Scale,
+  Utensils,
+  Car,
   CheckCircle,
 } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 
 const PROOF_ICONS = [
-  { Icon: Wrench, label: "HVAC" },
-  { Icon: Droplets, label: "Plumbing" },
-  { Icon: Snowflake, label: "Cooling" },
-  { Icon: Home, label: "Roofing" },
-  { Icon: Zap, label: "Electrical" },
+  { Icon: Stethoscope, label: "Medical" },
+  { Icon: Scissors,    label: "Salon" },
+  { Icon: Scale,       label: "Legal" },
+  { Icon: Utensils,    label: "Restaurant" },
+  { Icon: Car,         label: "Auto" },
 ];
 
 const CALL_MESSAGES = [
-  { role: "ai", text: "Thanks for calling Smith Plumbing! This is Alex. How can I help you today?" },
-  { role: "user", text: "My water heater stopped working this morning" },
-  { role: "ai", text: "I can get a technician out today. Can I get your address?" },
+  { role: "ai",   text: "Thanks for calling! This is Alex, your AI receptionist. How can I help?" },
+  { role: "user", text: "Hi, I'd like to schedule an appointment" },
+  { role: "ai",   text: "Of course! I have openings this week. What day works best for you?" },
 ];
 
 export function Hero() {
@@ -59,7 +59,7 @@ export function Hero() {
           >
             <span className="w-[6px] h-[6px] rounded-full bg-brand-blue inline-block" />
             <span className="text-[11px] text-brand-blue tracking-[0.1em] font-semibold">
-              AI RECEPTIONIST FOR HOME SERVICES
+              AI RECEPTIONIST FOR YOUR BUSINESS
             </span>
           </div>
 
@@ -71,7 +71,7 @@ export function Hero() {
               animationDelay: "0.12s",
             }}
           >
-            Stop Losing Jobs
+            Stop Losing Customers
             <br />
             to{" "}
             <span
@@ -95,7 +95,7 @@ export function Hero() {
             style={{ animationDelay: "0.24s" }}
           >
             SmartScale AI answers every call 24/7, books appointments, and
-            sends confirmations automatically — while you focus on the job.
+            sends confirmations automatically — while you focus on your business.
           </p>
 
           {/* CTAs */}
@@ -133,7 +133,7 @@ export function Hero() {
                 </div>
               ))}
             </div>
-            <span>Built for HVAC, plumbing, roofing &amp; more</span>
+            <span>Works for any business, any industry</span>
           </div>
         </div>
 

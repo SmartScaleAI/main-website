@@ -56,8 +56,8 @@ export const STEPS: Step[] = [
   },
   {
     number: "03",
-    title: "You Show Up to Booked Jobs",
-    desc: "Every caller is logged, every appointment confirmed. You focus on the work. SmartScale handles the phones.",
+    title: "You Focus on Your Business",
+    desc: "Every caller is logged, every appointment confirmed. You focus on your business. SmartScale handles the phones.",
   },
 ];
 
@@ -65,7 +65,7 @@ export const BENEFITS: Benefit[] = [
   {
     icon: "Phone",
     title: "Never Miss a Call Again",
-    desc: "Every call answered instantly — nights, weekends, holidays. No voicemail. No missed jobs to a competitor.",
+    desc: "Every call answered instantly — nights, weekends, holidays. No voicemail. No missed customers to a competitor.",
   },
   {
     icon: "Calendar",
@@ -113,7 +113,7 @@ export const PLANS: Plan[] = [
   {
     name: "Standard",
     price: "$399",
-    desc: "Most popular for growing home service businesses",
+    desc: "Most popular for growing businesses",
     features: [
       "Everything in Starter",
       "Up to 400 calls/mo",
@@ -171,9 +171,9 @@ export const FAQS: FaqItem[] = [
 ];
 
 export const HERO_PROOF_ICONS = [
-  { name: "Wrench", label: "HVAC" },
-  { name: "Droplets", label: "Plumbing" },
-  { name: "Snowflake", label: "Cooling" },
-  { name: "Home", label: "Roofing" },
-  { name: "Zap", label: "Electrical" },
+  { name: "Stethoscope", label: "Medical" },
+  { name: "Scissors",    label: "Salon" },
+  { name: "Scale",       label: "Legal" },
+  { name: "Utensils",    label: "Restaurant" },
+  { name: "Car",         label: "Auto" },
 ];
