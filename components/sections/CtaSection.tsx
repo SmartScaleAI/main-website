@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AnimatedSection } from "@/components/shared/AnimatedSection";
 
 export function CtaSection() {
@@ -38,12 +39,12 @@ export function CtaSection() {
             long-term contracts. Just more booked jobs.
           </p>
           <div className="flex flex-col sm:flex-row gap-[14px] justify-center flex-wrap">
-            <a
-              href="#faq"
+            <Link
+              href="/book-demo"
               className="bg-brand-blue text-brand-bg font-bold px-10 py-[17px] rounded-[6px] text-[16px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(41,182,246,0.3)] w-full sm:w-auto max-w-[320px] mx-auto sm:mx-0 text-center"
             >
               Book a Free Demo
-            </a>
+            </Link>
           </div>
         </div>
       </AnimatedSection>

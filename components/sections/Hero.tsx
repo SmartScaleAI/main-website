@@ -8,6 +8,7 @@ import {
   Car,
   CheckCircle,
 } from "lucide-react";
+import Link from "next/link";
 import { Logo } from "@/components/shared/Logo";
 
 const PROOF_ICONS = [
@@ -103,12 +104,12 @@ export function Hero() {
             className="flex gap-3 flex-wrap mb-10 justify-center md:justify-start animate-fade-up flex-col sm:flex-row items-center md:items-start"
             style={{ animationDelay: "0.36s" }}
           >
-            <a
-              href="#faq"
+            <Link
+              href="/book-demo"
               className="bg-brand-blue text-brand-bg font-bold px-8 py-[14px] rounded-[6px] text-[15px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(41,182,246,0.3)] w-full sm:w-auto max-w-[320px] text-center"
             >
               Book a Free Demo
-            </a>
+            </Link>
             <a
               href="#how-it-works"
               className="bg-transparent text-brand-text border border-brand-text/20 px-8 py-[14px] rounded-[6px] text-[15px] font-normal tracking-[0.02em] transition-all duration-200 hover:border-brand-blue/50 hover:text-brand-blue hover:-translate-y-px w-full sm:w-auto max-w-[320px] text-center"

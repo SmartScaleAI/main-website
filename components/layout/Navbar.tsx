@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Logo } from "@/components/shared/Logo";
 import { NAV_ITEMS } from "@/components/shared/data";
 import {
@@ -63,12 +64,12 @@ export function Navbar() {
             </button>
           ))}
         </div>
-        <button
-          onClick={() => scrollTo("faq")}
+        <Link
+          href="/book-demo"
           className="bg-brand-blue text-brand-bg text-[13px] font-bold px-[22px] py-[10px] rounded-[6px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(41,182,246,0.3)]"
         >
           Book a Demo
-        </button>
+        </Link>
       </div>
 
       {/* Mobile hamburger */}
@@ -97,12 +98,13 @@ export function Navbar() {
               </button>
             ))}
             <div className="px-6 py-7">
-              <button
-                onClick={() => scrollTo("faq")}
-                className="w-full bg-brand-blue text-brand-bg font-bold py-4 text-[16px] rounded-[6px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light"
+              <Link
+                href="/book-demo"
+                onClick={() => setMenuOpen(false)}
+                className="block w-full bg-brand-blue text-brand-bg font-bold py-4 text-[16px] rounded-[6px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light text-center"
               >
                 Book a Demo
-              </button>
+              </Link>
             </div>
           </div>
         </SheetContent>
