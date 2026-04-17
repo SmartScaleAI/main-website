@@ -1,6 +1,11 @@
+import Link from "next/link";
 import { Logo } from "@/components/shared/Logo";
 
-const FOOTER_LINKS = ["Privacy Policy", "Terms of Service", "Contact"];
+const FOOTER_LINKS: { label: string; href: string }[] = [
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms of Service", href: "#" },
+  { label: "Contact", href: "#" },
+];
 
 export function Footer() {
   return (
@@ -19,14 +24,14 @@ export function Footer() {
 
         {/* Links */}
         <div className="flex gap-6 flex-wrap">
-          {FOOTER_LINKS.map((l) => (
-            <a
-              key={l}
-              href="#"
+          {FOOTER_LINKS.map(({ label, href }) => (
+            <Link
+              key={label}
+              href={href}
               className="text-brand-text/25 text-xs no-underline transition-colors duration-200 hover:text-brand-blue/70"
             >
-              {l}
-            </a>
+              {label}
+            </Link>
           ))}
         </div>
 
