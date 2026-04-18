@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/Logo";
+import { ContactModal } from "@/components/ui/ContactModal";
 
 const FOOTER_LINKS: { label: string; href: string }[] = [
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms of Service", href: "/terms-of-service" },
-  { label: "Contact", href: "#" },
 ];
 
 export function Footer() {
@@ -23,7 +23,7 @@ export function Footer() {
         </div>
 
         {/* Links */}
-        <div className="flex gap-6 flex-wrap">
+        <div className="flex gap-6 flex-wrap items-center">
           {FOOTER_LINKS.map(({ label, href }) => (
             <Link
               key={label}
@@ -33,6 +33,7 @@ export function Footer() {
               {label}
             </Link>
           ))}
+          <ContactModal />
         </div>
 
         {/* Copyright */}
