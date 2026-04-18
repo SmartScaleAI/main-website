@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   CheckCircle,
@@ -8,9 +8,6 @@ import {
   Calendar,
   ClipboardList,
   PartyPopper,
-  ArrowRight,
-  ChevronDown,
-  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,25 +19,20 @@ enum Step {
   Confirmed = 3,
 }
 
-const BUSINESS_TYPES = [
-  "HVAC",
-  "Plumbing",
-  "Electrical",
-  "Roofing",
-  "Landscaping / Lawn Care",
-  "Pest Control",
-  "Cleaning / Maid Services",
-  "Pool Service",
-  "Painting",
-  "Garage Door",
-  "General Contractor",
-  "Other",
-];
+const BUSINESS_TYPES = ["HVAC", "Plumbing"];
 
 const STEPS = [
   { value: Step.Info, label: "Your Info", Icon: ClipboardList },
   { value: Step.Schedule, label: "Schedule", Icon: Calendar },
   { value: Step.Confirmed, label: "Confirmed", Icon: PartyPopper },
+];
+
+const MONTHLY_REVENUE_OPTIONS = [
+  "Under $10K",
+  "$10K – $50K",
+  "$50K – $100K",
+  "$100K – $250K",
+  "$250K+",
 ];
 
 interface FormData {
@@ -50,6 +42,7 @@ interface FormData {
   phone: string;
   email: string;
   businessTypes: string[];
+  monthlyRevenue: string;
   smsConsent: boolean;
   marketingConsent: boolean;
 }
@@ -61,6 +54,7 @@ const EMPTY_FORM: FormData = {
   phone: "",
   email: "",
   businessTypes: [],
+  monthlyRevenue: "",
   smsConsent: false,
   marketingConsent: false,
 };
@@ -72,103 +66,36 @@ function BusinessTypeSelect({
   selected: string[];
   onToggle: (type: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const label =
-    selected.length === 0
-      ? "Select business types…"
-      : selected.length === 1
-        ? selected[0]
-        : `${selected.length} types selected`;
-
   return (
-    <div className="relative" ref={ref}>
-      <label className="block text-[12px] font-semibold text-brand-text/60 mb-1.5 tracking-wide uppercase">
-        Business Type <span className="text-brand-blue">*</span>
-      </label>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={cn(
-          "w-full flex items-center justify-between bg-white/[.04] border rounded-[8px] px-3.5 py-2.5 text-[14px] transition-all text-left",
-          open
-            ? "border-brand-blue/50 ring-1 ring-brand-blue/30"
-            : "border-brand-text/10 hover:border-brand-blue/30",
-          selected.length === 0 ? "text-brand-text/25" : "text-brand-text",
-        )}
-      >
-        <span className="truncate">{label}</span>
-        <ChevronDown
-          size={15}
-          className={cn(
-            "flex-none text-brand-text/35 transition-transform duration-200 ml-2",
-            open && "rotate-180",
-          )}
-        />
-      </button>
-
-      {open && (
-        <div className="absolute z-50 mt-1.5 w-full rounded-[10px] border border-brand-blue/15 bg-[#0b2538] backdrop-blur-xl shadow-[0_16px_48px_rgba(0,0,0,0.5)] overflow-hidden">
-          <div className="max-h-[220px] overflow-y-auto py-1">
-            {BUSINESS_TYPES.map((type) => {
-              const active = selected.includes(type);
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => onToggle(type)}
-                  className="w-full flex items-center gap-3 px-3.5 py-2.5 text-[13px] text-left transition-colors hover:bg-brand-blue/[.07]"
-                >
-                  <span
-                    className={cn(
-                      "w-4 h-4 rounded border-2 flex items-center justify-center flex-none transition-all",
-                      active
-                        ? "bg-brand-blue border-brand-blue"
-                        : "border-brand-text/20 bg-white/[.03]",
-                    )}
-                  >
-                    {active && (
-                      <Check size={9} color="#071d2e" strokeWidth={3.5} />
-                    )}
-                  </span>
-                  <span
-                    className={
-                      active ? "text-brand-text" : "text-brand-text/55"
-                    }
-                  >
-                    {type}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          {selected.length > 0 && (
-            <div className="border-t border-brand-blue/10 px-3.5 py-2 flex items-center justify-between">
-              <span className="text-[11px] text-brand-text/30">
-                {selected.length} selected
-              </span>
-              <button
-                type="button"
-                onClick={() => selected.forEach((t) => onToggle(t))}
-                className="text-[11px] text-brand-blue/60 hover:text-brand-blue transition-colors"
-              >
-                Clear all
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+    <div>
+      <div className="flex items-center gap-2 mb-1.5">
+        <label className="text-[12px] font-semibold text-brand-text/60 tracking-wide uppercase">
+          Business Type <span className="text-brand-blue">*</span>
+        </label>
+        <span className="text-[11px] text-brand-text/35 italic">
+          Select one or both
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {BUSINESS_TYPES.map((type) => {
+          const active = selected.includes(type);
+          return (
+            <button
+              key={type}
+              type="button"
+              onClick={() => onToggle(type)}
+              className={cn(
+                "flex items-center justify-center rounded-[8px] px-3.5 py-3 text-[14px] font-semibold border-2 transition-all",
+                active
+                  ? "bg-brand-blue/15 border-brand-blue text-brand-text"
+                  : "bg-white/[.04] border-brand-text/10 text-brand-text/55 hover:border-brand-blue/30 hover:text-brand-text/80",
+              )}
+            >
+              {type}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -238,15 +165,6 @@ export default function BookDemoPage() {
     };
   }, [step]);
 
-  function toggleBusinessType(type: string) {
-    setForm((prev) => ({
-      ...prev,
-      businessTypes: prev.businessTypes.includes(type)
-        ? prev.businessTypes.filter((t) => t !== type)
-        : [...prev.businessTypes, type],
-    }));
-  }
-
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -263,6 +181,10 @@ export default function BookDemoPage() {
     }
     if (form.businessTypes.length === 0) {
       setError("Please select at least one business type.");
+      return;
+    }
+    if (!form.monthlyRevenue) {
+      setError("Please select your approximate monthly revenue.");
       return;
     }
     if (!form.smsConsent) {
@@ -377,8 +299,8 @@ export default function BookDemoPage() {
                 Book Your Free Demo
               </h1>
               <p className="text-[14px] text-brand-text/45 mb-7">
-                Tell us about your business and we&apos;ll show you exactly how
-                SmartScale AI can help.
+                Tell us about your HVAC or plumbing business and we&apos;ll show
+                you exactly how SmartScale AI can help.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -465,8 +387,49 @@ export default function BookDemoPage() {
                 {/* Business Type */}
                 <BusinessTypeSelect
                   selected={form.businessTypes}
-                  onToggle={toggleBusinessType}
+                  onToggle={(type) =>
+                    setForm((p) => ({
+                      ...p,
+                      businessTypes: p.businessTypes.includes(type)
+                        ? p.businessTypes.filter((t) => t !== type)
+                        : [...p.businessTypes, type],
+                    }))
+                  }
                 />
+
+                {/* Monthly Revenue */}
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <label className="text-[12px] font-semibold text-brand-text/60 tracking-wide uppercase">
+                      Monthly Revenue <span className="text-brand-blue">*</span>
+                    </label>
+                    <span className="text-[11px] text-brand-text/35 italic">
+                      Approximate
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {MONTHLY_REVENUE_OPTIONS.map((option) => {
+                      const active = form.monthlyRevenue === option;
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() =>
+                            setForm((p) => ({ ...p, monthlyRevenue: option }))
+                          }
+                          className={cn(
+                            "flex items-center justify-center rounded-[8px] px-2 py-2.5 text-[13px] font-semibold border-2 transition-all",
+                            active
+                              ? "bg-brand-blue/15 border-brand-blue text-brand-text"
+                              : "bg-white/[.04] border-brand-text/10 text-brand-text/55 hover:border-brand-blue/30 hover:text-brand-text/80",
+                          )}
+                        >
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 {/* Consent checkboxes */}
                 <div className="space-y-3 pt-1">
@@ -506,7 +469,7 @@ export default function BookDemoPage() {
                       <strong className="text-brand-text/70 font-semibold">
                         SmartScale AI
                       </strong>{" "}
-                      about your AI receptionist demo request. Message frequency
+                      about your AI automation demo request. Message frequency
                       varies, message &amp; data rates may apply. Text HELP for
                       assistance, reply STOP to opt out.
                     </span>
@@ -608,15 +571,27 @@ export default function BookDemoPage() {
               </div>
               <div className="h-12" />
 
-              <div className="relative overflow-hidden" style={{ minHeight: "600px" }}>
+              <div
+                className="relative overflow-hidden"
+                style={{ minHeight: "600px" }}
+              >
                 {/* Loader shown until iframe fires onLoad */}
                 {!iframeLoaded && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
                     <div className="w-10 h-10 rounded-full border-2 border-brand-blue/20 border-t-brand-blue animate-spin" />
-                    <span className="text-[13px] text-brand-text/30">Loading calendar…</span>
+                    <span className="text-[13px] text-brand-text/30">
+                      Loading calendar…
+                    </span>
                   </div>
                 )}
-                <div style={{ marginTop: "-16px", marginBottom: "-16px", opacity: iframeLoaded ? 1 : 0, transition: "opacity 0.3s ease" }}>
+                <div
+                  style={{
+                    marginTop: "-16px",
+                    marginBottom: "-16px",
+                    opacity: iframeLoaded ? 1 : 0,
+                    transition: "opacity 0.3s ease",
+                  }}
+                >
                   <iframe
                     src={`https://links.smartaiscaling.com/widget/booking/zUALVUIV1ZRWmPgr9TIi?first_name=${encodeURIComponent(form.firstName)}&last_name=${encodeURIComponent(form.lastName)}&phone=${encodeURIComponent(form.phone)}&email=${encodeURIComponent(form.email)}`}
                     onLoad={() => setIframeLoaded(true)}
@@ -663,8 +638,8 @@ export default function BookDemoPage() {
                 !
               </h2>
               <p className="text-[14px] text-brand-text/50 mb-8">
-                Your discovery call is booked. We&apos;re looking forward to
-                showing you what SmartScale AI can do for your business.
+                Your demo call is booked. We&apos;re looking forward to showing
+                you what SmartScale AI can do for your business.
               </p>
 
               {/* What to expect */}

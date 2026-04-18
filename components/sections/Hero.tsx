@@ -1,35 +1,38 @@
 import {
   Phone,
-  Calendar,
-  Stethoscope,
-  Scissors,
-  Scale,
-  Utensils,
-  Car,
+  Wrench,
+  Flame,
+  Droplets,
+  Thermometer,
+  Wind,
   CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/shared/Logo";
 
 const PROOF_ICONS = [
-  { Icon: Stethoscope, label: "Medical" },
-  { Icon: Scissors,    label: "Salon" },
-  { Icon: Scale,       label: "Legal" },
-  { Icon: Utensils,    label: "Restaurant" },
-  { Icon: Car,         label: "Auto" },
+  { Icon: Wrench, label: "Plumbing" },
+  { Icon: Flame, label: "Heating" },
+  { Icon: Droplets, label: "Water" },
+  { Icon: Thermometer, label: "HVAC" },
+  { Icon: Wind, label: "Air" },
 ];
 
 const CALL_MESSAGES = [
-  { role: "ai",   text: "Thanks for calling! This is Alex, your AI receptionist. How can I help?" },
-  { role: "user", text: "Hi, I'd like to schedule an appointment" },
-  { role: "ai",   text: "Of course! I have openings this week. What day works best for you?" },
+  {
+    role: "ai",
+    text: "Thanks for calling! This is Alex with SmartScale AI. How can I help?",
+  },
+  { role: "user", text: "Hi, my AC stopped working — I need someone today" },
+  {
+    role: "ai",
+    text: "Of course! Let me check availability for an emergency visit. What's your zip code?",
+  },
 ];
 
 export function Hero() {
   return (
-    <section
-      className="min-h-screen flex items-center px-6 pt-[100px] pb-[72px] relative overflow-hidden"
-    >
+    <section className="min-h-screen flex items-center px-6 pt-[100px] pb-[72px] relative overflow-hidden">
       {/* Radial gradient bg */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -60,7 +63,7 @@ export function Hero() {
           >
             <span className="w-[6px] h-[6px] rounded-full bg-brand-blue inline-block" />
             <span className="text-[11px] text-brand-blue tracking-[0.1em] font-semibold">
-              AI RECEPTIONIST FOR YOUR BUSINESS
+              AI AUTOMATION FOR HVAC &amp; PLUMBING
             </span>
           </div>
 
@@ -72,9 +75,7 @@ export function Hero() {
               animationDelay: "0.12s",
             }}
           >
-            Stop Losing Customers
-            <br />
-            to{" "}
+            Never Miss a Job. <br />
             <span
               style={{
                 background:
@@ -86,7 +87,7 @@ export function Hero() {
                 animation: "shimmer 3s linear infinite",
               }}
             >
-              Missed Calls.
+              Never Lose a Lead.
             </span>
           </h1>
 
@@ -95,8 +96,8 @@ export function Hero() {
             className="text-[17px] leading-[1.65] text-brand-text/55 mb-9 font-light animate-fade-up md:max-w-[460px] max-w-full"
             style={{ animationDelay: "0.24s" }}
           >
-            SmartScale AI answers every call 24/7, books appointments, and
-            sends confirmations automatically — while you focus on your business.
+            SmartScale AI runs your ads and answers every call 24/7 — so HVAC
+            contractors and plumbers never miss a booked job again.
           </p>
 
           {/* CTAs */}
@@ -134,7 +135,9 @@ export function Hero() {
                 </div>
               ))}
             </div>
-            <span>Works for any business, any industry</span>
+            <span>
+              Built exclusively for HVAC contractors &amp; plumbing companies
+            </span>
           </div>
         </div>
 
@@ -154,7 +157,7 @@ export function Hero() {
 
           {/* Card */}
           <div
-            className="w-full max-w-[340px] md:w-[300px] bg-white/[.03] border border-brand-blue/15 rounded-[16px] p-6 animate-float backdrop-blur-[12px] relative z-[1]"
+            className="w-full max-w-[340px] md:max-w-[300px] lg:max-w-none bg-white/[.03] border border-brand-blue/15 rounded-[16px] p-6 md:p-8 animate-float backdrop-blur-[12px] relative z-[1] md:min-h-[420px] flex flex-col justify-between"
             style={{
               boxShadow:
                 "0 32px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(41,182,246,0.1)",
@@ -192,9 +195,7 @@ export function Hero() {
                         ? "rgba(41,182,246,0.1)"
                         : "rgba(255,255,255,0.06)",
                     color:
-                      msg.role === "ai"
-                        ? "#7dd3f5"
-                        : "rgba(232,244,253,0.75)",
+                      msg.role === "ai" ? "#7dd3f5" : "rgba(232,244,253,0.75)",
                   }}
                 >
                   {msg.text}

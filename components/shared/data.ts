@@ -15,16 +15,6 @@ export interface Benefit {
   desc: string;
 }
 
-export interface Plan {
-  name: string;
-  price: string;
-  desc: string;
-  features: string[];
-  cta: string;
-  highlight: boolean;
-  badge?: string;
-}
-
 export interface FaqItem {
   q: string;
   a: string;
@@ -36,120 +26,75 @@ export const NAV_ITEMS: [string, string][] = [
 ];
 
 export const STATS: StatItem[] = [
-  { value: "24/7", label: "Always Answering" },
-  { value: "< 2s", label: "Answer Time" },
+  { value: "24/7", label: "Lead Gen & Call Capture" },
+  { value: "< 2s", label: "AI Answer Time" },
   { value: "80%", label: "Calls Resolved by AI" },
-  { value: "0", label: "Missed Opportunities" },
+  { value: "0", label: "Missed Booked Jobs" },
 ];
 
 export const STEPS: Step[] = [
   {
     number: "01",
-    title: "We Learn Your Business",
-    desc: "We gather your services, hours, FAQs, and booking rules. SmartScale AI configures and trains your receptionist — ready to go live in under a week.",
+    title: "We Build Your System",
+    desc: "We learn your services, coverage area, and pricing. We launch targeted ad campaigns and configure your AI receptionist — live in under a week.",
   },
   {
     number: "02",
-    title: "AI Answers Every Call",
-    desc: "Your dedicated number is live 24/7. SmartScale AI books appointments, answers questions, and transfers urgent calls to your team instantly.",
+    title: "Leads Come In Around the Clock",
+    desc: "Your ads generate inbound calls day and night. Your AI receptionist answers every one instantly, booking appointments and capturing every lead.",
   },
   {
     number: "03",
-    title: "You Focus on Your Business",
-    desc: "Every caller is logged, every appointment confirmed. You focus on your business. SmartScale handles the phones.",
+    title: "You Show Up and Get Paid",
+    desc: "Every lead captured, every appointment confirmed. You focus on doing the work — SmartScale handles the rest.",
   },
 ];
 
 export const BENEFITS: Benefit[] = [
   {
+    icon: "Megaphone",
+    title: "Ads Built for Your Trade",
+    desc: "Done-for-you campaigns targeting homeowners who need HVAC or plumbing in your area. We run, optimize, and manage everything — 24/7.",
+  },
+  {
     icon: "Phone",
     title: "Never Miss a Call Again",
-    desc: "Every call answered instantly — nights, weekends, holidays. No voicemail. No missed customers to a competitor.",
+    desc: "Every call answered instantly — nights, weekends, holidays. No voicemail. No missed jobs to a competitor.",
   },
   {
     icon: "Calendar",
     title: "Appointments Booked Automatically",
-    desc: "SmartScale AI books directly to your calendar based on your real availability. Confirmation texts sent instantly.",
+    desc: "Your AI receptionist books directly to your calendar based on your real availability. Confirmation texts sent instantly.",
   },
   {
-    icon: "ArrowLeftRight",
-    title: "Smart Call Transfers",
-    desc: "Urgent situations? Your AI knows exactly when to hand off to a real person — every single time.",
+    icon: "Link2",
+    title: "One Integrated System",
+    desc: "Your ads feed your receptionist. Every dollar you spend on ads turns into a captured lead — nothing falls through the cracks.",
   },
   {
     icon: "MessageSquare",
-    title: "Knows Your Business Cold",
-    desc: "Pricing, service area, availability — SmartScale AI is trained on your specific business and answers confidently.",
-  },
-  {
-    icon: "Users",
-    title: "Every Caller Becomes a Lead",
-    desc: "All callers are automatically saved to your CRM with full call details, notes, and next steps.",
+    title: "Trained on Your Trade",
+    desc: "Services, service area, pricing — your AI knows HVAC and plumbing inside out and answers every caller confidently.",
   },
   {
     icon: "Zap",
-    title: "Real-Time Call Summaries",
-    desc: "Get an instant notification after every call — who called, what they needed, what was booked.",
-  },
-];
-
-export const PLANS: Plan[] = [
-  {
-    name: "Starter",
-    price: "$299",
-    desc: "Perfect for small operations ready to stop missing calls",
-    features: [
-      "AI receptionist 24/7",
-      "Up to 200 calls/mo",
-      "Appointment booking",
-      "SMS confirmations",
-      "Basic call summaries",
-      "Email support",
-    ],
-    cta: "Get Started",
-    highlight: false,
-  },
-  {
-    name: "Standard",
-    price: "$399",
-    desc: "Most popular for growing businesses",
-    features: [
-      "Everything in Starter",
-      "Up to 400 calls/mo",
-      "After-hours handling",
-      "CRM lead pipeline",
-      "Review request automation",
-      "Priority support",
-    ],
-    cta: "Get Started",
-    highlight: true,
-    badge: "Most Popular",
-  },
-  {
-    name: "Pro",
-    price: "$599",
-    desc: "For high-volume businesses that can't miss anything",
-    features: [
-      "Everything in Standard",
-      "Unlimited calls",
-      "Missed call text-back",
-      "Advanced analytics dashboard",
-      "Multi-location support",
-      "Dedicated account manager",
-    ],
-    cta: "Get Started",
-    highlight: false,
+    title: "Real-Time Job Summaries",
+    desc: "Get an instant notification after every call — who called, what they needed, and what was booked.",
   },
 ];
 
 export const FAQS: FaqItem[] = [
   {
     q: "How much does it cost?",
-    a: "Our pricing is tailored to the size and needs of your business. Book a free discovery call and a rep will walk you through a custom quote — no pressure, no commitment.",
+    a: "Our pricing is tailored to your business. Book a free demo call and we'll walk you through everything — no pressure, no commitment.",
   },
   {
-    q: "Will it sound robotic?",
-    a: "Not at all. SmartScale AI uses the latest voice technology — it sounds natural, professional, and conversational. We give your receptionist a name and personality that represents your brand.",
+    q: "Do you handle the ads too?",
+    a: "Yes — ads management is fully included. We build, run, and optimize your campaigns. Your ad spend goes directly to ads and is never bundled into our fee.",
+  },
+  {
+    q: "Will the AI sound robotic?",
+    a: "Not at all. SmartScale AI uses the latest voice technology — it sounds natural, professional, and conversational. It's trained specifically on HVAC and plumbing so it can talk the talk with every caller.",
   },
   {
     q: "What if a caller needs a real person?",
@@ -165,18 +110,10 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: "What if I want to cancel?",
-    a: "No long-term contracts. Cancel anytime with 30 days notice. We'll help you transition your number back with no hassle.",
+    a: "We require a 3-month minimum engagement to give the system time to perform. After that, continue month-to-month with 30 days notice.",
   },
   {
     q: "Do I need any technical knowledge?",
     a: "Zero. SmartScale AI handles everything end to end. You get a phone number, a calendar that fills itself, and a simple dashboard showing every call.",
   },
-];
-
-export const HERO_PROOF_ICONS = [
-  { name: "Stethoscope", label: "Medical" },
-  { name: "Scissors",    label: "Salon" },
-  { name: "Scale",       label: "Legal" },
-  { name: "Utensils",    label: "Restaurant" },
-  { name: "Car",         label: "Auto" },
 ];

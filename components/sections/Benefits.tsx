@@ -1,10 +1,10 @@
 import {
   Phone,
   Calendar,
-  ArrowLeftRight,
   MessageSquare,
-  Users,
   Zap,
+  Megaphone,
+  Link2,
   LucideIcon,
 } from "lucide-react";
 import { BENEFITS } from "@/components/shared/data";
@@ -13,10 +13,10 @@ import { AnimatedSection } from "@/components/shared/AnimatedSection";
 const ICON_MAP: Record<string, LucideIcon> = {
   Phone,
   Calendar,
-  ArrowLeftRight,
   MessageSquare,
-  Users,
   Zap,
+  Megaphone,
+  Link2,
 };
 
 export function Benefits() {
@@ -33,8 +33,8 @@ export function Benefits() {
               className="font-extrabold leading-[1.1] text-brand-text tracking-[-0.02em] max-w-[560px]"
               style={{ fontSize: "clamp(26px, 4.5vw, 50px)" }}
             >
-              Everything a receptionist does.{" "}
-              <span className="text-brand-blue">Smarter.</span>
+              We generate the lead.{" "}
+              <span className="text-brand-blue">We make sure it gets answered.</span>
             </h2>
           </div>
         </AnimatedSection>
