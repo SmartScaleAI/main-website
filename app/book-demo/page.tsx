@@ -14,16 +14,16 @@ import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/Logo";
 
 enum Step {
-  Info = 1,
-  Schedule = 2,
+  Schedule = 1,
+  Info = 2,
   Confirmed = 3,
 }
 
 const BUSINESS_TYPES = ["HVAC", "Plumbing"];
 
 const STEPS = [
-  { value: Step.Info, label: "Your Info", Icon: ClipboardList },
   { value: Step.Schedule, label: "Schedule", Icon: Calendar },
+  { value: Step.Info, label: "Info", Icon: ClipboardList },
   { value: Step.Confirmed, label: "Confirmed", Icon: PartyPopper },
 ];
 
@@ -58,6 +58,16 @@ const EMPTY_FORM: FormData = {
   smsConsent: false,
   marketingConsent: false,
 };
+
+function formatPhone(value: string) {
+  let digits = value.replace(/\D/g, "");
+  // Strip US country code (+1) if present
+  if (digits.length === 11 && digits.startsWith("1")) digits = digits.slice(1);
+  digits = digits.slice(0, 10);
+  if (digits.length <= 3) return digits.length ? `(${digits}` : "";
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
 
 function BusinessTypeSelect({
   selected,
@@ -101,8 +111,9 @@ function BusinessTypeSelect({
 }
 
 export default function BookDemoPage() {
-  const [step, setStep] = useState(Step.Info);
+  const [step, setStep] = useState(Step.Schedule);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
+  const [contactId, setContactId] = useState("");
   const [error, setError] = useState("");
   const [iframeHeight, setIframeHeight] = useState<number | null>(null);
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -111,29 +122,35 @@ export default function BookDemoPage() {
     if (step !== Step.Schedule) return;
     function onMessage(e: MessageEvent) {
       const d = e.data;
-      // Debug: log every message from the iframe to find the exact format
-      console.log("[GHL postMessage]", typeof d, d);
-      const str = typeof d === "string" ? d : JSON.stringify(d ?? "");
-      if (
-        d === "appointmentBooked" ||
-        d?.event === "appointmentBooked" ||
-        d?.type === "appointmentBooked" ||
-        d?.eventType === "appointmentBooked" ||
-        d?.message === "appointmentBooked" ||
-        d?.action === "appointmentBooked" ||
-        str.toLowerCase().includes("appointmentbooked") ||
-        str.toLowerCase().includes("appointment_booked") ||
-        str.toLowerCase().includes("meeting") ||
-        (typeof d === "string" && d.toLowerCase().includes("booked"))
-      ) {
-        console.log("[GHL] Booking detected, advancing to step 3");
-        fetch("/api/book-demo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        }).catch(() => {});
-        setStep(Step.Confirmed);
+
+      // GHL sends booking data as:
+      // ["set-sticky-contacts", "_ud", "{...JSON...}", locationId, fingerprint]
+      if (Array.isArray(d) && d[0] === "set-sticky-contacts") {
+        try {
+          const contact = typeof d[2] === "string" ? JSON.parse(d[2]) : d[2];
+          console.log("[GHL] set-sticky-contacts contact:", contact);
+
+          if (!contact || !contact.appointment) return;
+
+          setContactId(contact.id ?? contact.customer_id ?? "");
+          setForm((prev) => ({
+            ...prev,
+            firstName:
+              contact.first_name ?? contact.firstName ?? prev.firstName,
+            lastName: contact.last_name ?? contact.lastName ?? prev.lastName,
+            phone: formatPhone(contact.phone ?? prev.phone),
+            email: contact.email ?? prev.email,
+          }));
+          setStep(Step.Info);
+        } catch (err) {
+          console.error(
+            "[GHL] Failed to parse set-sticky-contacts payload",
+            err,
+          );
+        }
+        return;
       }
+
       // Capture GHL height resize messages
       const h =
         typeof d === "number"
@@ -147,9 +164,9 @@ export default function BookDemoPage() {
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [step, form]);
+  }, [step]);
 
-  // Re-inject form_embed.js each time step 2 mounts so GHL auto-resizes the iframe
+  // Re-inject form_embed.js each time step 1 mounts so GHL auto-resizes the iframe
   useEffect(() => {
     if (step !== Step.Schedule) return;
     const existing = document.getElementById("ghl-form-embed");
@@ -165,29 +182,12 @@ export default function BookDemoPage() {
     };
   }, [step]);
 
-  function formatPhone(value: string) {
-    const digits = value.replace(/\D/g, "").slice(0, 10);
-    if (digits.length <= 3) return digits.length ? `(${digits}` : "";
-    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-  }
-
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
-    if (
-      !form.firstName ||
-      !form.lastName ||
-      !form.businessName ||
-      !form.phone ||
-      !form.email
-    ) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    if (form.phone.replace(/\D/g, "").length !== 10) {
-      setError("Please enter a valid 10-digit phone number.");
+    if (!form.businessName) {
+      setError("Please fill in your business name.");
       return;
     }
     if (form.businessTypes.length === 0) {
@@ -203,7 +203,18 @@ export default function BookDemoPage() {
       return;
     }
 
-    setStep(Step.Schedule);
+    fetch("/api/book-demo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, contactId }),
+    }).catch(() => {});
+
+    // Clear GHL sticky contact data so the calendar doesn't pre-fill next visit
+    try {
+      localStorage.removeItem("_ud");
+    } catch {}
+
+    setStep(Step.Confirmed);
   }
 
   return (
@@ -293,7 +304,73 @@ export default function BookDemoPage() {
           ))}
         </div>
 
-        {/* Step 1 — Lead Form */}
+        {/* Step 1 — Schedule */}
+        {step === Step.Schedule && (
+          <div
+            className="w-full max-w-5xl animate-fade-up"
+            style={{ animationDelay: "0.05s" }}
+          >
+            <div
+              className="bg-white/[.03] border border-brand-blue/15 rounded-[16px] p-6 md:p-8 backdrop-blur-[12px]"
+              style={{
+                boxShadow:
+                  "0 32px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(41,182,246,0.08)",
+              }}
+            >
+              <div className="text-center mb-6">
+                <h2 className="text-[22px] font-bold text-brand-text tracking-normal">
+                  Schedule Your Demo
+                </h2>
+                <p className="text-[14px] text-brand-text/45 mt-1">
+                  Pick a time that works for you — the call usually takes 45–60
+                  minutes.
+                </p>
+              </div>
+
+              <div
+                className="relative overflow-hidden"
+                style={{ minHeight: "600px" }}
+              >
+                {!iframeLoaded && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                    <div className="w-10 h-10 rounded-full border-2 border-brand-blue/20 border-t-brand-blue animate-spin" />
+                    <span className="text-[13px] text-brand-text/30">
+                      Loading calendar…
+                    </span>
+                  </div>
+                )}
+                <div
+                  style={{
+                    marginTop: "-16px",
+                    marginBottom: "-16px",
+                    opacity: iframeLoaded ? 1 : 0,
+                    transition: "opacity 0.3s ease",
+                  }}
+                >
+                  <iframe
+                    src="https://links.smartaiscaling.com/widget/booking/zUALVUIV1ZRWmPgr9TIi"
+                    onLoad={() => setIframeLoaded(true)}
+                    style={{
+                      width: "100%",
+                      border: "none",
+                      display: "block",
+                      height: iframeHeight ? `${iframeHeight}px` : undefined,
+                      minHeight: iframeHeight ? undefined : "min(900px, 80svh)",
+                    }}
+                    id="zUALVUIV1ZRWmPgr9TIi_1776398703235"
+                  />
+                </div>
+              </div>
+
+              <p className="mt-4 text-center text-[14px] text-brand-text/30">
+                You&apos;ll be moved to the next step automatically once your
+                call is booked.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2 — Info */}
         {step === Step.Info && (
           <div
             className="w-full max-w-xl animate-fade-up"
@@ -307,46 +384,14 @@ export default function BookDemoPage() {
               }}
             >
               <h1 className="text-[22px] font-bold text-brand-text mb-1 tracking-tight">
-                Book Your Free Demo
+                Info
               </h1>
               <p className="text-[14px] text-brand-text/45 mb-7">
-                Tell us about your HVAC or plumbing business and we&apos;ll show
-                you exactly how SmartScale AI can help.
+                Tell us about your business so we can tailor the demo to your
+                needs.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Name row */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[12px] font-semibold text-brand-text/60 mb-1.5 tracking-wide uppercase">
-                      First Name <span className="text-brand-blue">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={form.firstName}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, firstName: e.target.value }))
-                      }
-                      placeholder="John"
-                      className="w-full bg-white/[.04] border border-brand-text/10 rounded-[8px] px-3.5 py-2.5 text-[14px] text-brand-text placeholder:text-brand-text/25 focus:outline-none focus:border-brand-blue/50 focus:ring-1 focus:ring-brand-blue/30 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-brand-text/60 mb-1.5 tracking-wide uppercase">
-                      Last Name <span className="text-brand-blue">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={form.lastName}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, lastName: e.target.value }))
-                      }
-                      placeholder="Smith"
-                      className="w-full bg-white/[.04] border border-brand-text/10 rounded-[8px] px-3.5 py-2.5 text-[14px] text-brand-text placeholder:text-brand-text/25 focus:outline-none focus:border-brand-blue/50 focus:ring-1 focus:ring-brand-blue/30 transition-all"
-                    />
-                  </div>
-                </div>
-
                 {/* Business Name */}
                 <div>
                   <label className="block text-[12px] font-semibold text-brand-text/60 mb-1.5 tracking-wide uppercase">
@@ -361,38 +406,6 @@ export default function BookDemoPage() {
                     placeholder="Smith's Plumbing Co."
                     className="w-full bg-white/[.04] border border-brand-text/10 rounded-[8px] px-3.5 py-2.5 text-[14px] text-brand-text placeholder:text-brand-text/25 focus:outline-none focus:border-brand-blue/50 focus:ring-1 focus:ring-brand-blue/30 transition-all"
                   />
-                </div>
-
-                {/* Phone + Email */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[12px] font-semibold text-brand-text/60 mb-1.5 tracking-wide uppercase">
-                      Phone <span className="text-brand-blue">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, phone: formatPhone(e.target.value) }))
-                      }
-                      placeholder="(555) 000-0000"
-                      className="w-full bg-white/[.04] border border-brand-text/10 rounded-[8px] px-3.5 py-2.5 text-[14px] text-brand-text placeholder:text-brand-text/25 focus:outline-none focus:border-brand-blue/50 focus:ring-1 focus:ring-brand-blue/30 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-brand-text/60 mb-1.5 tracking-wide uppercase">
-                      Email <span className="text-brand-blue">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, email: e.target.value }))
-                      }
-                      placeholder="john@example.com"
-                      className="w-full bg-white/[.04] border border-brand-text/10 rounded-[8px] px-3.5 py-2.5 text-[14px] text-brand-text placeholder:text-brand-text/25 focus:outline-none focus:border-brand-blue/50 focus:ring-1 focus:ring-brand-blue/30 transition-all"
-                    />
-                  </div>
                 </div>
 
                 {/* Business Type */}
@@ -540,88 +553,9 @@ export default function BookDemoPage() {
                   type="submit"
                   className="w-full bg-brand-blue text-brand-bg font-bold text-[15px] px-8 py-[14px] rounded-[6px] tracking-[0.02em] transition-all duration-200 hover:bg-brand-blue-light hover:-translate-y-px hover:shadow-[0_8px_28px_rgba(41,182,246,0.3)]"
                 >
-                  Continue to Schedule →
+                  Complete Booking →
                 </button>
               </form>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2 — Schedule */}
-        {step === Step.Schedule && (
-          <div
-            className="w-full max-w-5xl animate-fade-up"
-            style={{ animationDelay: "0.05s" }}
-          >
-            <div
-              className="bg-white/[.03] border border-brand-blue/15 rounded-[16px] p-6 md:p-8 backdrop-blur-[12px]"
-              style={{
-                boxShadow:
-                  "0 32px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(41,182,246,0.08)",
-              }}
-            >
-              <div className="relative flex items-start mb-1">
-                <button
-                  type="button"
-                  onClick={() => setStep(Step.Info)}
-                  className="flex items-center gap-1 text-[14px] text-brand-text/40 hover:text-brand-text/70 transition-colors pt-[5px] flex-none"
-                >
-                  <ArrowLeft size={14} className="mt-[1px]" />
-                  Back
-                </button>
-                <div className="absolute inset-x-0 text-center pointer-events-none">
-                  <h2 className="text-[22px] font-bold text-brand-text tracking-normal">
-                    Schedule Your Demo
-                  </h2>
-                  <p className="text-[14px] text-brand-text/45 mt-1">
-                    Pick a time that works for you — the call usually takes
-                    45-60 minutes.
-                  </p>
-                </div>
-                <div className="flex-1" />
-              </div>
-              <div className="h-12" />
-
-              <div
-                className="relative overflow-hidden"
-                style={{ minHeight: "600px" }}
-              >
-                {/* Loader shown until iframe fires onLoad */}
-                {!iframeLoaded && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                    <div className="w-10 h-10 rounded-full border-2 border-brand-blue/20 border-t-brand-blue animate-spin" />
-                    <span className="text-[13px] text-brand-text/30">
-                      Loading calendar…
-                    </span>
-                  </div>
-                )}
-                <div
-                  style={{
-                    marginTop: "-16px",
-                    marginBottom: "-16px",
-                    opacity: iframeLoaded ? 1 : 0,
-                    transition: "opacity 0.3s ease",
-                  }}
-                >
-                  <iframe
-                    src={`https://links.smartaiscaling.com/widget/booking/zUALVUIV1ZRWmPgr9TIi?first_name=${encodeURIComponent(form.firstName)}&last_name=${encodeURIComponent(form.lastName)}&phone=${encodeURIComponent(form.phone)}&email=${encodeURIComponent(form.email)}`}
-                    onLoad={() => setIframeLoaded(true)}
-                    style={{
-                      width: "100%",
-                      border: "none",
-                      display: "block",
-                      height: iframeHeight ? `${iframeHeight}px` : undefined,
-                      minHeight: iframeHeight ? undefined : "min(900px, 80svh)",
-                    }}
-                    id="zUALVUIV1ZRWmPgr9TIi_1776398703235"
-                  />
-                </div>
-              </div>
-
-              <p className="mt-4 text-center text-[14px] text-brand-text/30">
-                You&apos;ll be moved to the next step automatically once your
-                call is booked.
-              </p>
             </div>
           </div>
         )}
