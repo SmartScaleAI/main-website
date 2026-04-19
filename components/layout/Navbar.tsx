@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/shared/Logo";
 import { NAV_ITEMS } from "@/components/shared/data";
 import {
@@ -13,6 +14,8 @@ import {
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => {
@@ -26,6 +29,10 @@ export function Navbar() {
   const scrollTo = (id: string) => {
     const wasOpen = menuOpen;
     setMenuOpen(false);
+    if (pathname !== "/") {
+      router.push(`/#${id}`);
+      return;
+    }
     setTimeout(
       () => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }),
       wasOpen ? 300 : 0
@@ -41,7 +48,7 @@ export function Navbar() {
       className={`fixed top-0 left-0 right-0 z-[100] px-6 h-[68px] flex items-center justify-between transition-all duration-400 ${navBg}`}
     >
       {/* Logo */}
-      <div className="flex items-center gap-[10px]">
+      <Link href="/" className="flex items-center gap-[10px]">
         <Logo size={24} />
         <span
           className="text-[17px] font-extrabold tracking-[-0.01em] text-brand-text"
@@ -49,7 +56,7 @@ export function Navbar() {
         >
           SmartScale <span className="text-brand-blue">AI</span>
         </span>
-      </div>
+      </Link>
 
       {/* Desktop links */}
       <div className="hidden md:flex items-center gap-10">
@@ -63,6 +70,12 @@ export function Navbar() {
               {label}
             </button>
           ))}
+          <Link
+            href="/roi-calculator"
+            className="text-brand-text/55 text-sm hover:text-brand-text transition-colors duration-200 tracking-[0.01em]"
+          >
+            ROI Calculator
+          </Link>
         </div>
         <Link
           href="/book-demo"
@@ -97,6 +110,14 @@ export function Navbar() {
                 {label}
               </button>
             ))}
+            <Link
+              href="/roi-calculator"
+              onClick={() => setMenuOpen(false)}
+              className="px-8 py-[22px] text-[22px] font-bold text-brand-text/65 border-b border-brand-blue/[.07] cursor-pointer text-left transition-colors duration-200 hover:text-brand-blue hover:bg-brand-blue/[.04] block"
+              style={{ fontFamily: "var(--font-barlow)", letterSpacing: "-0.01em" }}
+            >
+              ROI Calculator
+            </Link>
             <div className="px-6 py-7">
               <Link
                 href="/book-demo"
