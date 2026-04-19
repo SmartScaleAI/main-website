@@ -165,6 +165,13 @@ export default function BookDemoPage() {
     };
   }, [step]);
 
+  function formatPhone(value: string) {
+    const digits = value.replace(/\D/g, "").slice(0, 10);
+    if (digits.length <= 3) return digits.length ? `(${digits}` : "";
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -177,6 +184,10 @@ export default function BookDemoPage() {
       !form.email
     ) {
       setError("Please fill in all required fields.");
+      return;
+    }
+    if (form.phone.replace(/\D/g, "").length !== 10) {
+      setError("Please enter a valid 10-digit phone number.");
       return;
     }
     if (form.businessTypes.length === 0) {
@@ -362,7 +373,7 @@ export default function BookDemoPage() {
                       type="tel"
                       value={form.phone}
                       onChange={(e) =>
-                        setForm((p) => ({ ...p, phone: e.target.value }))
+                        setForm((p) => ({ ...p, phone: formatPhone(e.target.value) }))
                       }
                       placeholder="(555) 000-0000"
                       className="w-full bg-white/[.04] border border-brand-text/10 rounded-[8px] px-3.5 py-2.5 text-[14px] text-brand-text placeholder:text-brand-text/25 focus:outline-none focus:border-brand-blue/50 focus:ring-1 focus:ring-brand-blue/30 transition-all"
