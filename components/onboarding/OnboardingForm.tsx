@@ -80,7 +80,7 @@ export default function OnboardingForm() {
   const [errors, setErrors] = useState<StepErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [submitted, setSubmitted] = useState(true);
+  const [submitted, setSubmitted] = useState(false);
 
   const validators = [validateStep1, validateStep2, validateStep3];
 
