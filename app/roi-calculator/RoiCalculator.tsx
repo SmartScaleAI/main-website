@@ -33,23 +33,50 @@ function InputCard({
   rangeMinLabel: string
   rangeMaxLabel: string
 }) {
+  const [localVal, setLocalVal] = useState("")
+  const [focused, setFocused] = useState(false)
+
+  function commit(raw: string) {
+    const v = Number(raw)
+    const clamped = isNaN(v) || raw === "" ? value : Math.max(min, Math.min(max, v))
+    onChange(clamped)
+    setLocalVal(String(clamped))
+  }
+
   return (
     <div className="bg-[#0d2233] border border-brand-blue/10 rounded-md p-5 transition-colors duration-200 focus-within:border-brand-blue/40">
-      <label className="block text-[11px] font-semibold tracking-[0.15em] uppercase text-[#6b8fa8] mb-2.5">
-        {label}
-      </label>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-2.5">
+        <label className="block text-[11px] font-semibold tracking-[0.15em] uppercase text-[#6b8fa8]">
+          {label}
+        </label>
+        <span className="text-[10px] text-brand-blue/50 tracking-wide">tap to edit</span>
+      </div>
+      <div className={`flex items-center gap-2 border-b pb-1 transition-colors duration-150 ${focused ? "border-brand-blue/60" : "border-transparent"}`}>
         {prefix && (
           <span className="text-[20px] font-bold text-brand-blue">{prefix}</span>
         )}
         <input
           type="number"
-          value={value}
+          value={focused ? localVal : value}
           min={min}
           max={max}
+          onFocus={() => {
+            setLocalVal(String(value))
+            setFocused(true)
+          }}
           onChange={(e) => {
+            setLocalVal(e.target.value)
             const v = Number(e.target.value)
-            if (!isNaN(v)) onChange(Math.max(min, Math.min(max, v)))
+            if (!isNaN(v) && e.target.value !== "") {
+              onChange(Math.max(min, Math.min(max, v)))
+            }
+          }}
+          onBlur={(e) => {
+            setFocused(false)
+            commit(e.target.value)
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur()
           }}
           className="roi-num-input bg-transparent border-none outline-none text-brand-text font-extrabold text-[28px] w-full"
         />
@@ -103,14 +130,10 @@ export function RoiCalculator() {
   const [missedRate, setMissedRate] = useState(35)
   const [jobValue, setJobValue] = useState(450)
   const [closeRate, setCloseRate] = useState(40)
-  const [dormant, setDormant] = useState(200)
-  const [reactRate, setReactRate] = useState(8)
   const missedCallsPerMonth = Math.round((calls * missedRate) / 100)
   const jobsRecovered = Math.round((missedCallsPerMonth * closeRate) / 100)
   const missedRevenue = jobsRecovered * jobValue
-  const reactJobs = Math.round((dormant * reactRate) / 100)
-  const reactRevenue = reactJobs * jobValue
-  const totalRevenue3mo = missedRevenue * 3 + reactRevenue
+  const totalRevenue3mo = missedRevenue * 3
 
   return (
     <>
@@ -167,27 +190,21 @@ export function RoiCalculator() {
       <div className="relative z-10 max-w-[860px] mx-auto px-6 pt-[calc(68px+48px)] pb-20">
         {/* Header */}
         <div className="text-center mb-12">
-          <div
-            className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-brand-blue border border-brand-blue/25 px-3.5 py-1.5 rounded-sm mb-5"
-            style={{ background: "rgba(41,182,246,0.1)" }}
-          >
-            SmartScale AI
-          </div>
           <h1
             className="font-extrabold uppercase leading-none tracking-[-0.01em] text-brand-text mb-4"
             style={{ fontSize: "clamp(36px, 7vw, 64px)" }}
           >
             ROI <span className="text-brand-blue">Calculator</span>
           </h1>
-          <p className="text-[15px] text-[#6b8fa8] max-w-[480px] mx-auto leading-relaxed">
+          <p className="text-[15px] text-[#6b8fa8] max-w-120 mx-auto leading-relaxed">
             Show HVAC & plumbing clients exactly how much revenue they&apos;re leaving
             on the table — and how fast SmartScale AI pays for itself.
           </p>
         </div>
 
-        {/* Business Inputs */}
-        <SectionLabel>Business Inputs</SectionLabel>
-        <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 mb-8">
+        {/* Step 1: Call Volume */}
+        <SectionLabel>Your Call Volume</SectionLabel>
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 mb-6">
           <InputCard
             label="Monthly Inbound Calls"
             value={calls}
@@ -211,20 +228,36 @@ export function RoiCalculator() {
             rangeMinLabel="5%"
             rangeMaxLabel="70%"
           />
+        </div>
+
+        {/* Leads Delivered Callout */}
+        <div
+          className="rounded-lg px-8 py-6 mb-8 flex items-center justify-between gap-6 max-sm:flex-col max-sm:text-center"
+          style={{ background: "linear-gradient(135deg, rgba(41,182,246,0.12), rgba(41,182,246,0.06))", border: "1px solid rgba(41,182,246,0.3)" }}
+        >
+          <div>
+            <div className="text-[11px] font-bold tracking-[0.2em] uppercase text-brand-blue mb-1">
+              Calls We Capture For You
+            </div>
+            <div className="text-[13px] text-[#6b8fa8] leading-relaxed">
+              Every month, SmartScale AI answers {missedCallsPerMonth} calls your business would have missed — connecting you with customers before they call a competitor.
+            </div>
+          </div>
+          <div className="shrink-0 text-center">
+            <div className="text-[56px] font-extrabold leading-none text-brand-blue">
+              {missedCallsPerMonth}
+            </div>
+            <div className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#6b8fa8] mt-1">
+              captured calls / mo
+            </div>
+          </div>
+        </div>
+
+        {/* Step 2: Close Potential */}
+        <SectionLabel>Your Close Potential</SectionLabel>
+        <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 mb-8">
           <InputCard
-            label="Avg Job Value ($)"
-            value={jobValue}
-            onChange={setJobValue}
-            min={100}
-            max={15000}
-            prefix="$"
-            rangeMin={100}
-            rangeMax={5000}
-            rangeMinLabel="$100"
-            rangeMaxLabel="$5,000+"
-          />
-          <InputCard
-            label="Close Rate on Recovered Leads"
+            label="My Close Rate on These Leads"
             value={closeRate}
             onChange={setCloseRate}
             min={5}
@@ -236,27 +269,16 @@ export function RoiCalculator() {
             rangeMaxLabel="80%"
           />
           <InputCard
-            label="Dormant Customers in Database"
-            value={dormant}
-            onChange={setDormant}
-            min={0}
-            max={5000}
-            rangeMin={0}
-            rangeMax={2000}
-            rangeMinLabel="0"
-            rangeMaxLabel="2,000+"
-          />
-          <InputCard
-            label="Reactivation Close Rate"
-            value={reactRate}
-            onChange={setReactRate}
-            min={1}
-            max={30}
-            suffix="%"
-            rangeMin={1}
-            rangeMax={30}
-            rangeMinLabel="1%"
-            rangeMaxLabel="30%"
+            label="Avg Job Value"
+            value={jobValue}
+            onChange={setJobValue}
+            min={100}
+            max={15000}
+            prefix="$"
+            rangeMin={100}
+            rangeMax={5000}
+            rangeMinLabel="$100"
+            rangeMaxLabel="$5,000+"
           />
         </div>
 
@@ -271,12 +293,10 @@ export function RoiCalculator() {
               Monthly Revenue Impact
             </span>
           </div>
-          <div className="grid grid-cols-3 max-sm:grid-cols-2">
-            <ResultCell label="Missed Calls / Mo" value={String(missedCallsPerMonth)} color="blue" sub="recovered with AI" />
+          <div className="grid grid-cols-2">
+            <ResultCell label="Calls Captured / Mo" value={String(missedCallsPerMonth)} color="blue" sub="answered before they're lost" />
             <ResultCell label="Jobs Recovered" value={String(jobsRecovered)} color="blue" sub="booked from callbacks" />
             <ResultCell label="Missed Call Revenue" value={fmtDollar(missedRevenue)} color="green" sub="per month" isLast3n />
-            <ResultCell label="Reactivation Jobs" value={String(reactJobs)} color="blue" sub="from dormant list" />
-            <ResultCell label="Reactivation Revenue" value={fmtDollar(reactRevenue)} color="green" sub="one-time campaign" />
             <ResultCell label="Total New Revenue" value={fmtDollar(totalRevenue3mo)} color="green" sub="first 3 months" isLast3n />
           </div>
         </div>
@@ -284,7 +304,7 @@ export function RoiCalculator() {
         {/* Assumptions */}
         <p className="text-[11px] text-[#6b8fa8] text-center leading-relaxed mt-8 px-4">
           * Projections based on industry averages for HVAC & plumbing businesses. Missed call rate
-          industry benchmark: 30–40%. Reactivation campaigns typically yield 5–12% response.
+          industry benchmark: 30–40%.
           Individual results will vary based on market, service area, and business size.
         </p>
       </div>
